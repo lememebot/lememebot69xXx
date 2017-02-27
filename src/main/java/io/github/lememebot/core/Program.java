@@ -7,9 +7,9 @@ package io.github.lememebot.core;
  *
  * Description:
  */
+
 public class Program {
-    public static void main(String args[])
-    {
+    public static void main(String args[]) {
         System.out.println("Program Startup");
 
 

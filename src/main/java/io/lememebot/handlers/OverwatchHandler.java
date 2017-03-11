@@ -18,8 +18,19 @@ public class OverwatchHandler extends IBaseHandler {
     }
 
     @Override
-    protected void onMessage(Command cmd)
+    public void onMessage(Command cmd)
     {
+        switch (cmd.getCommand())
+        {
+            case "hey":
+                String heroName = cmd.getParameter(1);
+                if(!heroName.isEmpty())
+                {
+                    // play specific hero sound
+                    playSound(heroName);
+                }
 
+                break;
+        }
     }
 }

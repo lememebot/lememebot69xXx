@@ -2,8 +2,11 @@ package io.lememebot.handlers;
 
 import io.lememebot.core.Command;
 import io.lememebot.core.Gang;
+import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.VoiceChannel;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.core.managers.AudioManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -14,28 +17,36 @@ import org.apache.logging.log4j.Logger;
  * <p>
  * Description:
  */
-public abstract class IBaseHandler extends ListenerAdapter {
+public abstract class IBaseHandler {
 
-    private Command command;
+    private Command m_command;
     private MessageReceivedEvent m_event;
     final static Logger log = LogManager.getLogger();
 
+
     IBaseHandler(String strCmdPrefix)
     {
-        command = new Command(strCmdPrefix);
-    }
-
-    @Override
-    public final void onMessageReceived(MessageReceivedEvent event) {
-        m_event = event;
-        if(command.parse(event.getMessage().getContent()))
-        {
-            onMessage(command);
-        }
+        m_command = new Command(strCmdPrefix);
     }
 
     // Abstract method to be implemented on real handlers
-    protected abstract void onMessage(Command cmd);
+    public abstract void onMessage(Command cmd);
+
+    public void setEvent(MessageReceivedEvent event)
+    {
+        m_event = event;
+    }
+
+    public Command getCommand()
+    {
+        return m_command;
+    }
+
+    void playSound(String resourceName)
+    {
+        // Get audio manager from bot server
+
+    }
 
     MessageReceivedEvent getEvent()
     {
@@ -62,10 +73,7 @@ public abstract class IBaseHandler extends ListenerAdapter {
         return getAuthorName().equals(Gang.ZAFIG);
     }
 
-    protected boolean isSenderMalul()
-    {
-        return getAuthorName().equals(Gang.MALUL);
-    }
+    protected boolean isSenderMalul() { return getAuthorName().equals(Gang.MALUL); }
 
     protected boolean isSenderDean()
     {

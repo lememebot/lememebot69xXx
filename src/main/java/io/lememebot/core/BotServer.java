@@ -2,8 +2,11 @@ package io.lememebot.core;
 
 import io.lememebot.handlers.*;
 import net.dv8tion.jda.core.*;
+import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.exceptions.RateLimitedException;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.core.managers.AudioManager;
 
 import javax.security.auth.login.LoginException;
 import java.util.ArrayList;
@@ -16,10 +19,11 @@ import java.util.List;
  *
  * Description:
  */
-public class BotServer {
+public class BotServer extends ListenerAdapter {
 
     private JDA botInstance;
     private ArrayList<IBaseHandler> eventsHandlers;
+    private AudioManager audioManager;
 
     public BotServer() {
         eventsHandlers = new ArrayList<>(16);
@@ -35,13 +39,9 @@ public class BotServer {
                     .setAudioEnabled(true)
                     .setAutoReconnect(true)
                     .setStatus(OnlineStatus.ONLINE)
+                    .addListener(this)
                     .setToken("Mjg0NDEzOTUzNzU5NjQxNjEx.C6XbYg.rRsTdbJEfq--E-2Fp8zsh6u0ddU")
                     .buildBlocking();
-
-            // Register all handlers
-            for (IBaseHandler eventHandler : eventsHandlers) {
-                botInstance.addEventListener(eventHandler);
-            }
 
             return true;
         } catch (LoginException e) {
@@ -58,6 +58,34 @@ public class BotServer {
     public void shutdown() {
         botInstance.shutdown();
         botInstance = null;
+    }
+
+
+    @Override
+    public final void onMessageReceived(MessageReceivedEvent event) {
+        if(!event.getAuthor().isBot()) {
+
+            // Init audio manager
+            setAudioManager(event.getGuild());
+
+            for(IBaseHandler eventHandler : eventsHandlers) {
+                if(eventHandler.getCommand().parse(event.getMessage().getContent()))
+                {
+                    eventHandler.setEvent(event);
+                    eventHandler.onMessage(eventHandler.getCommand());
+                }
+            }
+        }
+    }
+
+    private void setAudioManager(Guild guild)
+    {
+        if (null == audioManager)
+        {
+            audioManager = guild.getAudioManager();
+            audioManager.setAutoReconnect(true);
+        }
+
     }
 
     public boolean isOnline() {

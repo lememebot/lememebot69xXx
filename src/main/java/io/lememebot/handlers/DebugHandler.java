@@ -1,5 +1,6 @@
 package io.lememebot.handlers;
 
+import io.lememebot.audio.AudioRequest;
 import io.lememebot.core.Command;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
@@ -18,7 +19,7 @@ public class DebugHandler extends IBaseHandler {
     }
 
     @Override
-    public void onMessage(Command cmd)
+    public AudioRequest onMessage(Command cmd)
     {
         log.debug("[{}] {}: {}",
                 getEvent().getChannelType().toString(),
@@ -30,5 +31,7 @@ public class DebugHandler extends IBaseHandler {
                 cmd.getParameter(1),
                 cmd.getParameter(2),
                 cmd.getParameter(3));
+
+        return null;
     }
 }

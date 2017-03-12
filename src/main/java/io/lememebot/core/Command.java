@@ -10,19 +10,33 @@ package io.lememebot.core;
 public class Command {
     private final String EMPTY="";
     private final String m_cmdPrefix;
+    private final int m_numParams;
     private String m_cmd;
     private String[] m_params;
 
-    public Command(String strCmdPrefix)
+    public Command(String strCmdPrefix,int cmdNumParameters)
     {
         m_cmdPrefix = strCmdPrefix;
+        m_numParams = cmdNumParameters;
+    }
+
+    public Command(String strCmdPrefix)
+    {
+        this(strCmdPrefix,-1);
     }
 
     // Return true if the command is valid for this pattern
-    public boolean parse(String message)
+    boolean parse(String message)
     {
         if(isEmptyPrefix() || message.startsWith(m_cmdPrefix)) {
-            m_params = message.split(" ");
+
+            if(m_numParams > 0) {
+                // Example: !(RemindMe) (thid should be parsed as one param)
+                m_params = message.split(" ", m_numParams);
+            } else {
+                m_params = message.split(" ");
+            }
+
             m_cmd = m_params[0].substring(m_cmdPrefix.length());
 
             return true;

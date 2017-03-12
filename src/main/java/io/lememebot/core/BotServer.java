@@ -1,5 +1,6 @@
 package io.lememebot.core;
 
+import io.lememebot.audio.AudioRequest;
 import io.lememebot.handlers.*;
 import net.dv8tion.jda.core.*;
 import net.dv8tion.jda.core.entities.Guild;
@@ -7,6 +8,8 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.exceptions.RateLimitedException;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import net.dv8tion.jda.core.managers.AudioManager;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.security.auth.login.LoginException;
 import java.util.ArrayList;
@@ -20,7 +23,7 @@ import java.util.List;
  * Description:
  */
 public class BotServer extends ListenerAdapter {
-
+    private final static Logger log = LogManager.getLogger();
     private JDA botInstance;
     private ArrayList<IBaseHandler> eventsHandlers;
     private AudioManager audioManager;
@@ -30,6 +33,8 @@ public class BotServer extends ListenerAdapter {
 
         eventsHandlers.add(new DebugHandler());
         eventsHandlers.add(new OverwatchHandler());
+        eventsHandlers.add(new HoferHandler());
+        eventsHandlers.add(new LastTimeHandler());
     }
 
     public boolean start() {
@@ -63,7 +68,9 @@ public class BotServer extends ListenerAdapter {
 
     @Override
     public final void onMessageReceived(MessageReceivedEvent event) {
+        // Dont hook other bot messages
         if(!event.getAuthor().isBot()) {
+            AudioRequest audioRequest;
 
             // Init audio manager
             setAudioManager(event.getGuild());
@@ -72,7 +79,13 @@ public class BotServer extends ListenerAdapter {
                 if(eventHandler.getCommand().parse(event.getMessage().getContent()))
                 {
                     eventHandler.setEvent(event);
-                    eventHandler.onMessage(eventHandler.getCommand());
+                    audioRequest = eventHandler.onMessage(eventHandler.getCommand());
+
+                    if(null != audioRequest)
+                    {
+                        // enqueue audio request
+                        log.debug("request {} from {}",audioRequest.getResourceName(),audioRequest.getAudioSource());
+                    }
                 }
             }
         }
@@ -85,7 +98,6 @@ public class BotServer extends ListenerAdapter {
             audioManager = guild.getAudioManager();
             audioManager.setAutoReconnect(true);
         }
-
     }
 
     public boolean isOnline() {

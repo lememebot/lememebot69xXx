@@ -1,5 +1,6 @@
 package io.lememebot.handlers;
 
+import io.lememebot.audio.AudioRequest;
 import io.lememebot.core.Command;
 import io.lememebot.core.Gang;
 import net.dv8tion.jda.core.entities.Guild;
@@ -20,6 +21,7 @@ import org.apache.logging.log4j.Logger;
 public abstract class IBaseHandler {
 
     private Command m_command;
+    private int m_numParameters;
     private MessageReceivedEvent m_event;
     final static Logger log = LogManager.getLogger();
 
@@ -29,8 +31,13 @@ public abstract class IBaseHandler {
         m_command = new Command(strCmdPrefix);
     }
 
+    IBaseHandler(String strCmdPrefix,int cmdNumParameters)
+    {
+        m_command = new Command(strCmdPrefix,cmdNumParameters);
+    }
+
     // Abstract method to be implemented on real handlers
-    public abstract void onMessage(Command cmd);
+    public abstract AudioRequest onMessage(Command cmd);
 
     public void setEvent(MessageReceivedEvent event)
     {
@@ -40,12 +47,6 @@ public abstract class IBaseHandler {
     public Command getCommand()
     {
         return m_command;
-    }
-
-    void playSound(String resourceName)
-    {
-        // Get audio manager from bot server
-
     }
 
     MessageReceivedEvent getEvent()
@@ -58,7 +59,12 @@ public abstract class IBaseHandler {
         return getEvent().getAuthor().getName();
     }
 
-    protected void sendMessage(String message)
+    boolean isBotMentioned() {
+        // TODO: check if this works
+        return getEvent().getMessage().getMentionedUsers().contains(getEvent().getJDA().getSelfUser());
+    }
+
+    void sendMessage(String message)
     {
         m_event.getTextChannel().sendMessage(message);
     }

@@ -1,7 +1,11 @@
 package io.lememebot.handlers;
 
+import io.lememebot.audio.AudioRequest;
 import io.lememebot.core.Command;
+import io.lememebot.extras.overwatch.OverwatchHero;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+
+import java.util.ArrayList;
 
 /**
  * Project: lememebot69xXx
@@ -18,7 +22,7 @@ public class OverwatchHandler extends IBaseHandler {
     }
 
     @Override
-    public void onMessage(Command cmd)
+    public AudioRequest onMessage(Command cmd)
     {
         switch (cmd.getCommand())
         {
@@ -26,11 +30,13 @@ public class OverwatchHandler extends IBaseHandler {
                 String heroName = cmd.getParameter(1);
                 if(!heroName.isEmpty())
                 {
-                    // play specific hero sound
-                    playSound(heroName);
+                    OverwatchHero owHero = OverwatchHero.getHero(heroName);
                 }
 
                 break;
         }
+
+        return null;
     }
+
 }

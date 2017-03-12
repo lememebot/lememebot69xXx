@@ -1,19 +1,16 @@
 package io.lememebot.core;
 
-import io.lememebot.audio.AudioRequest;
+import io.lememebot.audio.BotAudioManager;
+import io.lememebot.media.MediaRequest;
 import io.lememebot.handlers.*;
 import net.dv8tion.jda.core.*;
-import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.exceptions.RateLimitedException;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
-import net.dv8tion.jda.core.managers.AudioManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import javax.security.auth.login.LoginException;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Project: lememebot69xXx
@@ -26,10 +23,11 @@ public class BotServer extends ListenerAdapter {
     private final static Logger log = LogManager.getLogger();
     private JDA botInstance;
     private ArrayList<IBaseHandler> eventsHandlers;
-    private AudioManager audioManager;
+    private BotAudioManager botAudioManager;
 
     public BotServer() {
         eventsHandlers = new ArrayList<>(16);
+        botAudioManager = new BotAudioManager();
 
         eventsHandlers.add(new DebugHandler());
         eventsHandlers.add(new OverwatchHandler());
@@ -48,6 +46,8 @@ public class BotServer extends ListenerAdapter {
                     .setToken("Mjg0NDEzOTUzNzU5NjQxNjEx.C6XbYg.rRsTdbJEfq--E-2Fp8zsh6u0ddU")
                     .buildBlocking();
 
+            botAudioManager.Init();
+
             return true;
         } catch (LoginException e) {
             System.out.println("WTF is LoginException, hehe fuck that shit\nwait thats not that good");
@@ -61,6 +61,7 @@ public class BotServer extends ListenerAdapter {
     }
 
     public void shutdown() {
+        botAudioManager.shutdown();
         botInstance.shutdown();
         botInstance = null;
     }
@@ -70,33 +71,22 @@ public class BotServer extends ListenerAdapter {
     public final void onMessageReceived(MessageReceivedEvent event) {
         // Dont hook other bot messages
         if(!event.getAuthor().isBot()) {
-            AudioRequest audioRequest;
-
-            // Init audio manager
-            setAudioManager(event.getGuild());
+            MediaRequest mediaRequest;
 
             for(IBaseHandler eventHandler : eventsHandlers) {
                 if(eventHandler.getCommand().parse(event.getMessage().getContent()))
                 {
                     eventHandler.setEvent(event);
-                    audioRequest = eventHandler.onMessage(eventHandler.getCommand());
+                    mediaRequest = eventHandler.onMessage(eventHandler.getCommand());
 
-                    if(null != audioRequest)
+                    if(null != mediaRequest)
                     {
-                        // enqueue audio request
-                        log.debug("request {} from {}",audioRequest.getResourceName(),audioRequest.getAudioSource());
+                        log.debug("request {} from {}",mediaRequest.getMediaDescriptor().toString(),mediaRequest.getInvoker().getName());
+
+                        botAudioManager.playAudio(event.getGuild(),mediaRequest);
                     }
                 }
             }
-        }
-    }
-
-    private void setAudioManager(Guild guild)
-    {
-        if (null == audioManager)
-        {
-            audioManager = guild.getAudioManager();
-            audioManager.setAutoReconnect(true);
         }
     }
 

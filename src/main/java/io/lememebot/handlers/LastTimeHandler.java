@@ -1,6 +1,6 @@
 package io.lememebot.handlers;
 
-import io.lememebot.audio.AudioRequest;
+import io.lememebot.media.MediaRequest;
 import io.lememebot.core.Command;
 
 /**
@@ -15,7 +15,7 @@ public class LastTimeHandler extends IBaseHandler {
     }
 
     @Override
-    public AudioRequest onMessage(Command cmd)
+    public MediaRequest onMessage(Command cmd)
     {
         switch(cmd.getCommand())
         {

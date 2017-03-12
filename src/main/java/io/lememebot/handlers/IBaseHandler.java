@@ -1,13 +1,9 @@
 package io.lememebot.handlers;
 
-import io.lememebot.audio.AudioRequest;
+import io.lememebot.media.MediaRequest;
 import io.lememebot.core.Command;
 import io.lememebot.core.Gang;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.VoiceChannel;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
-import net.dv8tion.jda.core.managers.AudioManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -37,7 +33,7 @@ public abstract class IBaseHandler {
     }
 
     // Abstract method to be implemented on real handlers
-    public abstract AudioRequest onMessage(Command cmd);
+    public abstract MediaRequest onMessage(Command cmd);
 
     public void setEvent(MessageReceivedEvent event)
     {

@@ -46,7 +46,7 @@ public class HoferHandler extends IBaseHandler {
             if(m_numRoasts < 1)
             sendMessage("OMG " + currentSender.getAsMention() + " will you shut the fuck up already?!");
             else if (m_numRoasts % 3 == 0) {
-                sendMessage("For the love of chinchin just shut up" + currentSender.getAsMention());
+                sendMessage("For the love of chinchin just shut up " + currentSender.getAsMention());
             }
             else {
                 sendMessage("Shut up " + currentSender.getAsMention());

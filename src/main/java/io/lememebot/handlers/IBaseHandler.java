@@ -3,6 +3,7 @@ package io.lememebot.handlers;
 import io.lememebot.media.MediaRequest;
 import io.lememebot.core.Command;
 import io.lememebot.core.Gang;
+import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -53,6 +54,8 @@ public abstract class IBaseHandler {
     {
         return getEvent().getAuthor().getName();
     }
+
+    User getAuthor() { return getEvent().getAuthor();}
 
     boolean isBotMentioned() {
         // TODO: check if this works

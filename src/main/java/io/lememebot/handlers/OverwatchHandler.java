@@ -1,5 +1,6 @@
 package io.lememebot.handlers;
 
+import io.lememebot.extras.overwatch.OverwatchMedia;
 import io.lememebot.media.MediaDescriptor;
 import io.lememebot.media.MediaRequest;
 import io.lememebot.core.Command;
@@ -17,14 +18,13 @@ import java.util.Random;
  */
 public class OverwatchHandler extends IBaseHandler {
     private static final Random s_rnd = new Random();
-    public OverwatchHandler()
-    {
+
+    public OverwatchHandler() {
         super("!");
     }
 
     @Override
-    public MediaRequest onMessage(Command cmd)
-    {
+    public MediaRequest onMessage(Command cmd) {
         switch (cmd.getCommand()) {
             case "hello":
             case "hey":
@@ -41,7 +41,7 @@ public class OverwatchHandler extends IBaseHandler {
                 }
 
                 if (null == owHero) {
-                    log.error("[ERROR] OverwatchHandler: got null hero");
+                    log.error("got null overwatch hero for " + heroName);
                     sendMessage(heroName + " does not exists");
                     break;
                 }
@@ -53,19 +53,31 @@ public class OverwatchHandler extends IBaseHandler {
                     int index = Math.abs(s_rnd.nextInt()) % mediaDescriptorList.size();
                     MediaDescriptor mediaDescriptor = mediaDescriptorList.get(index);
 
-                    return (new MediaRequest(mediaDescriptor, getEvent().getAuthor()));
+                    return (new MediaRequest(mediaDescriptor, getAuthor()));
                 } else {
                     sendMessage(owHero.getName() + " has got no sound files");
                     log.debug(owHero.getName() + " has got no sound files, sorry m8 :(");
                 }
 
                 break;
+            case "potg": {
+                MediaDescriptor mediaDescriptor = OverwatchMedia.getSound("potg");
+                if (!mediaDescriptor.isNullOrEmpty()) {
+                    return (new MediaRequest(mediaDescriptor, getAuthor()));
+                }
+                break;
+            }
+            case "owroast":
+                MediaDescriptor mediaDescriptor = OverwatchMedia.getSound("defeat");
+                if (!mediaDescriptor.isNullOrEmpty()) {
+                    return (new MediaRequest(mediaDescriptor, getAuthor()));
+                }
+                break;
             case "help":
-                sendMessage("[OverwatchHandler] !hello <hero_name>, play the hero hello sound, you can also use zafig's retarded nicknames");
+                sendMessage("[OverwatchHandler] Options:\n!hello <hero_name>, play the hero hello sound, you can also use zafig's retarded nicknames\n!potg (yall know what that is)\n!owroast (play this when some1 got roasted and mr.negi generation 3000 is unavailable)");
                 break;
         }
 
         return null;
     }
-
 }

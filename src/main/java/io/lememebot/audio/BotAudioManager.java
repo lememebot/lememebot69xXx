@@ -32,10 +32,12 @@ public class BotAudioManager implements ConnectionListener {
     private AudioPlayerSendHandler m_handler;
     private DefaultTrackScheduler m_trackScheduler;
     private final Hashtable<String,AudioManager> audioManagersByGuild;
+    private VoiceChannel currentVoiceChannel;
 
     public BotAudioManager()
     {
         audioManagersByGuild = new Hashtable<>(3);
+        currentVoiceChannel = null;
     }
 
     public void Init()
@@ -61,35 +63,43 @@ public class BotAudioManager implements ConnectionListener {
     public void playAudio(Guild guild, MediaRequest mediaRequest) {
         if (!guild.getVoiceChannels().isEmpty()) {
             List<VoiceChannel> voiceChannelList = guild.getVoiceChannels();
-            VoiceChannel chosenChannel = null;
+            VoiceChannel userVoiceChannel = null;
 
             for (VoiceChannel voiceChannel : voiceChannelList) {
                 for (Member member : voiceChannel.getMembers()) {
                     if (member.getUser() == mediaRequest.getInvoker()) {
-                        chosenChannel = voiceChannel;
+                        userVoiceChannel = voiceChannel;
                         break;
                     }
                 }
             }
 
-            if (null != chosenChannel) {
-                log.debug("{} is in channel (Guild: {})", mediaRequest.getInvoker().getName(), chosenChannel.getName(),guild.getId());
+            if (null != userVoiceChannel) {
+                log.debug("{} is in channel (Guild: {})", mediaRequest.getInvoker().getName(), userVoiceChannel.getName(),guild.getId());
 
                 // Create an audio manager for the GUILD if it does not exist in the hashtable
+                AudioManager audioManager;
                 if(!audioManagersByGuild.containsKey(guild.getId())) {
-                    AudioManager audioManager = guild.getAudioManager();
-                    audioManager.openAudioConnection(chosenChannel);
+                    audioManager = guild.getAudioManager();
+                    audioManager.openAudioConnection(userVoiceChannel);
                     audioManager.setSendingHandler(m_handler);
                     audioManager.setConnectionListener(this);
+                    currentVoiceChannel = userVoiceChannel;
                     audioManagersByGuild.put(guild.getId(),audioManager);
+                } else
+                {
+                    audioManager = audioManagersByGuild.get(guild.getId());
+                    if(null == currentVoiceChannel || userVoiceChannel != currentVoiceChannel)
+                    {
+                        audioManager.closeAudioConnection();
+                        audioManager.openAudioConnection(userVoiceChannel);
+                        currentVoiceChannel = userVoiceChannel;
+                    }
                 }
 
                 String trackURL = mediaRequest.getMediaDescriptor().getURL().getFile();
                 log.info("Loading file {}",trackURL);
-
                 m_playerManager.loadItem(trackURL, m_trackScheduler);
-
-                //audioManager.closeAudioConnection();
             } else {
                 log.info("User is not in voice channel");
             }

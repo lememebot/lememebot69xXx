@@ -173,6 +173,6 @@ public class OverwatchHero implements IMediaProvider {
     {
         Integer index = (Math.abs(s_rnd.nextInt()) % s_numHeroes) + 1;
 
-        return s_heroes.get(index);
+        return s_heroes.getOrDefault(index,null);
     }
 }

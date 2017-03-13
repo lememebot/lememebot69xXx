@@ -17,7 +17,6 @@ import org.apache.logging.log4j.Logger;
 public abstract class IBaseHandler {
 
     private Command m_command;
-    private int m_numParameters;
     private MessageReceivedEvent m_event;
     final static Logger log = LogManager.getLogger();
 
@@ -62,7 +61,7 @@ public abstract class IBaseHandler {
 
     void sendMessage(String message)
     {
-        m_event.getTextChannel().sendMessage(message);
+        m_event.getChannel().sendMessage(message).submit();
     }
 
     protected boolean isSenderYoni()

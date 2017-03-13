@@ -1,14 +1,25 @@
 package io.lememebot.ui;
 
+import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXSpinner;
+import com.jfoenix.controls.JFXTextArea;
+import com.jfoenix.controls.JFXToggleButton;
 import io.lememebot.core.BotServer;
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.geometry.Pos;
+import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
+import javafx.event.EventHandler;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.layout.GridPane;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.io.IOException;
 
 /**
  * Project: lememebot69xXx
@@ -19,12 +30,17 @@ import javafx.stage.Stage;
  * Program main window for activating the bot
  */
 public class MainWindow extends Application{
+    private final static Logger log = LogManager.getLogger();
+    @FXML private JFXButton btn_bot_control;
+    @FXML private JFXButton btn_bot_status;
+    @FXML private JFXSpinner spn_bot_progress;
+    @FXML private JFXToggleButton tgl_log_dbg;
+    @FXML private JFXTextArea txt_log;
 
-    private BotServer botServer;
+    private volatile BotServer botServer;
 
     public MainWindow()
     {
-        botServer = new BotServer();
     }
 
     public MainWindow build()
@@ -35,36 +51,65 @@ public class MainWindow extends Application{
 
     @Override
     public void start(Stage primaryStage) {
+        Parent root = null;
+
+        try {
+            root = FXMLLoader.load(getClass().getResource("/UI/MainWindow.fxml"));
+        }
+        catch (IOException ex)
+        {
+            log.error("Could not load Main Window fxml");
+            ex.printStackTrace();
+        }
+
+        Scene scene = new Scene(root, 640, 560);
+        scene.getStylesheets().add("/UI/MainWindow.css");
         primaryStage.setTitle("lememebot");
-
-        GridPane grid = new GridPane();
-        grid.setAlignment(Pos.CENTER);
-
-        Label stoppedLabel = new Label("Bot Stopped");
-        stoppedLabel.getStyleClass().add("h1");
-        stoppedLabel.setVisible(false);
-
-        Button actionButton = new Button("Start Bot");
-        actionButton.setOnAction((ActionEvent e) -> {
-            if(botServer.isOnline()) {
-                botServer.shutdown();
-                actionButton.setVisible(false);
-                stoppedLabel.setVisible(true);
-            }
-            else
-            {
-                if (botServer.start()) {
-                    actionButton.setText("Stop Bot");
-                }
-            }
-        });
-
-        grid.add(stoppedLabel, 0, 0, 2, 2);
-        grid.add(actionButton, 0, 1, 2, 2);
-
-        Scene scene = new Scene(grid, 800, 600);
-        scene.getStylesheets().add("MainWindow.css");
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    /////////////
+    // Stage Events
+    /////////////
+
+    public void handleBotControlAction(MouseEvent mouseEvent) {
+        if (null == botServer) {
+            botServer = new BotServer();
+        }
+
+        if (botServer.isOnline()) {
+            botServer.stop();
+            btn_bot_control.setText("START");
+            btn_bot_status.setText("lememebot [OFFLINE]");
+            btn_bot_status.getStyleClass().remove("status_online");
+            btn_bot_status.getStyleClass().add("status_offline");
+            btn_bot_control.getStyleClass().remove("btn_stop");
+            btn_bot_control.getStyleClass().add("btn_start");
+        } else {
+            spn_bot_progress.setVisible(true);
+            Task<Boolean> taskBotStartup = new Task<Boolean>() {
+                @Override
+                protected Boolean call() throws Exception {
+                    return botServer.start();
+                }
+            };
+
+            taskBotStartup.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+                @Override
+                public void handle(WorkerStateEvent event) {
+                    btn_bot_control.setText("STOP");
+                    btn_bot_status.setText("lememebot [ONLINE]");
+                    btn_bot_status.getStyleClass().add("status_online");
+                    btn_bot_status.getStyleClass().remove("status_offline");
+                    btn_bot_control.getStyleClass().add("btn_stop");
+                    btn_bot_control.getStyleClass().remove("btn_start");
+                    spn_bot_progress.setVisible(false);
+                }
+            });
+            Thread threadBotStart = new Thread(taskBotStartup);
+            threadBotStart.setDaemon(true);
+            threadBotStart.start();
+        }
     }
 }

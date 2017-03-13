@@ -11,7 +11,7 @@ public class MediaRequest {
     private final MediaDescriptor m_descriptor;
     private final User m_invoker;
 
-    public MediaRequest(MediaDescriptor mediaDescriptor,User user)
+    public MediaRequest(MediaDescriptor mediaDescriptor, User user)
     {
         m_descriptor = mediaDescriptor;
         m_invoker = user;

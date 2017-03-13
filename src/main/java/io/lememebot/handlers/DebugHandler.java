@@ -20,7 +20,7 @@ public class DebugHandler extends IBaseHandler {
     @Override
     public MediaRequest onMessage(Command cmd)
     {
-        log.debug("[{}] {}: {}",
+        /*log.debug("[{}] {}: {}",
                 getEvent().getChannelType().toString(),
                 getAuthorName(),
                 getEvent().getMessage().getContent());
@@ -29,7 +29,12 @@ public class DebugHandler extends IBaseHandler {
                 cmd.getCommand(),
                 cmd.getParameter(1),
                 cmd.getParameter(2),
-                cmd.getParameter(3));
+                cmd.getParameter(3));*/
+
+        if(cmd.getCommand().equals("whoami"))
+        {
+            sendMessage("You are " + getEvent().getAuthor().getAsMention());
+        }
 
         return null;
     }

@@ -1,6 +1,5 @@
 package io.lememebot.handlers;
 
-import io.lememebot.media.IMediaProvider;
 import io.lememebot.media.MediaDescriptor;
 import io.lememebot.media.MediaRequest;
 import io.lememebot.core.Command;
@@ -26,34 +25,44 @@ public class OverwatchHandler extends IBaseHandler {
     @Override
     public MediaRequest onMessage(Command cmd)
     {
-        switch (cmd.getCommand())
-        {
+        switch (cmd.getCommand()) {
             case "hello":
             case "hey":
                 String heroName = cmd.getParameter(1);
-                IMediaProvider owHero = null;
+                OverwatchHero owHero;
 
-                if(!heroName.isEmpty())
-                {
+                if (!heroName.isEmpty()) {
+                    log.info("Got parameter:" + heroName);
                     owHero = OverwatchHero.getHero(heroName);
-                    if (null == owHero)
-                    {
-                        owHero = OverwatchHero.getRandomHero();
-                        sendMessage("[ERROR] OverwatchHandler: " + heroName + " not found, choosing random hero");
-                    }
-                }
-                else {
+                } else {
                     // Randrom choose hero
+                    log.info("No parameter, choosing random hero");
                     owHero = OverwatchHero.getRandomHero();
                 }
 
+                if (null == owHero) {
+                    log.error("[ERROR] OverwatchHandler: got null hero");
+                    sendMessage("[ERROR] OverwatchHandler: got null hero");
+                    break;
+                }
+
+                log.debug("chose " + owHero.getName());
+
                 final List<MediaDescriptor> mediaDescriptorList = owHero.getMediaDescriptorList();
-                if(!mediaDescriptorList.isEmpty()) {
-                    return new MediaRequest(mediaDescriptorList.get(s_rnd.nextInt() % mediaDescriptorList.size()), getEvent().getAuthor());
+                if (null != mediaDescriptorList && !mediaDescriptorList.isEmpty()) {
+                    int index = Math.abs(s_rnd.nextInt()) % mediaDescriptorList.size();
+                    MediaDescriptor mediaDescriptor = mediaDescriptorList.get(index);
+
+                    return (new MediaRequest(mediaDescriptor, getEvent().getAuthor()));
+                } else {
+                    sendMessage(owHero.getName() + " has got no sound files");
+                    log.debug(owHero.getName() + " has got no sound files, sorry m8 :(");
                 }
 
                 break;
-
+            case "help":
+                sendMessage("[OverwatchHandler] !hello <hero_name>, play the hero hello sound, you can also use zafig's retarded nicknames");
+                break;
         }
 
         return null;

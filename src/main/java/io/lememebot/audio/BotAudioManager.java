@@ -1,25 +1,21 @@
 package io.lememebot.audio;
 
-import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
-import com.sedmelluq.discord.lavaplayer.source.local.LocalAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
-import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import io.lememebot.media.MediaRequest;
+import net.dv8tion.jda.core.audio.hooks.ConnectionListener;
+import net.dv8tion.jda.core.audio.hooks.ConnectionStatus;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.entities.VoiceChannel;
 import net.dv8tion.jda.core.managers.AudioManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
-import java.net.URL;
+import java.util.Hashtable;
 import java.util.List;
 
 /**
@@ -29,30 +25,37 @@ import java.util.List;
  * <p>
  * Description:
  */
-public class BotAudioManager {
+public class BotAudioManager implements ConnectionListener {
     private final static Logger log = LogManager.getLogger();
-    AudioPlayerManager playerManager;
-    AudioPlayer player;
-    AudioPlayerSendHandler handler;
-    TrackScheduler trackScheduler;
+    private AudioPlayerManager m_playerManager;
+    private AudioPlayer m_player;
+    private AudioPlayerSendHandler m_handler;
+    private DefaultTrackScheduler m_trackScheduler;
+    private final Hashtable<String,AudioManager> audioManagersByGuild;
 
     public BotAudioManager()
     {
+        audioManagersByGuild = new Hashtable<>(3);
     }
 
     public void Init()
     {
-        playerManager = new DefaultAudioPlayerManager();
-        AudioSourceManagers.registerLocalSource(playerManager);
+        m_playerManager = new DefaultAudioPlayerManager();
+        AudioSourceManagers.registerLocalSource(m_playerManager);
 
-        player = playerManager.createPlayer();
-        handler = new AudioPlayerSendHandler(player);
-        trackScheduler = new TrackScheduler(player);
+        m_player = m_playerManager.createPlayer();
+        m_handler = new AudioPlayerSendHandler(m_player);
+        m_trackScheduler = new DefaultTrackScheduler(m_player);
     }
 
     public void shutdown()
     {
-        playerManager.shutdown();
+        for(AudioManager audioManager : audioManagersByGuild.values())
+        {
+            audioManager.closeAudioConnection();
+        }
+
+        m_playerManager.shutdown();
     }
 
     public void playAudio(Guild guild, MediaRequest mediaRequest) {
@@ -70,47 +73,48 @@ public class BotAudioManager {
             }
 
             if (null != chosenChannel) {
-                log.debug("{} is in channel ", mediaRequest.getInvoker().getName(), chosenChannel.getName());
-                AudioManager audioManager = guild.getAudioManager();
-                audioManager.openAudioConnection(chosenChannel);
-                audioManager.setSendingHandler(handler);
+                log.debug("{} is in channel (Guild: {})", mediaRequest.getInvoker().getName(), chosenChannel.getName(),guild.getId());
+
+                // Create an audio manager for the GUILD if it does not exist in the hashtable
+                if(!audioManagersByGuild.containsKey(guild.getId())) {
+                    AudioManager audioManager = guild.getAudioManager();
+                    audioManager.openAudioConnection(chosenChannel);
+                    audioManager.setSendingHandler(m_handler);
+                    audioManager.setConnectionListener(this);
+                    audioManagersByGuild.put(guild.getId(),audioManager);
+                }
 
                 String trackURL = mediaRequest.getMediaDescriptor().getURL().getFile();
                 log.info("Loading file {}",trackURL);
 
-                playerManager.loadItem(trackURL, new AudioLoadResultHandler() {
-                            @Override
-                            public void trackLoaded(AudioTrack track) {
-                                //trackScheduler.queue(track);
-                                log.info("Playing track {}" ,track.getIdentifier());
-                                trackScheduler.queue(track);
-                            }
-
-                            @Override
-                            public void playlistLoaded(AudioPlaylist playlist) {
-                                for (AudioTrack track : playlist.getTracks()) {
-                                    log.info("Playing track {}" ,track.getIdentifier());
-                                    trackScheduler.queue(track);
-                                }
-                            }
-
-                            @Override
-                            public void noMatches() {
-                                // Notify the user that we've got nothing
-                                log.info("Could not find this shitty sound file");
-                            }
-
-                            @Override
-                            public void loadFailed(FriendlyException throwable) {
-                                // Notify the user that everything exploded
-                                log.info("Cant play that shit dog");
-                            }
-                });
+                m_playerManager.loadItem(trackURL, m_trackScheduler);
 
                 //audioManager.closeAudioConnection();
             } else {
                 log.info("User is not in voice channel");
             }
         }
+    }
+
+    public void stopAudio()
+    {
+        m_player.stopTrack();
+    }
+
+    @Override
+    public void onPing(long l) {
+
+    }
+
+    @Override
+    public void onStatusChange(ConnectionStatus connectionStatus) {
+        if (ConnectionStatus.CONNECTED == connectionStatus ||
+                ConnectionStatus.NOT_CONNECTED == connectionStatus)
+            log.debug("[AudioManager] Status changed to {}", connectionStatus.toString());
+    }
+
+    @Override
+    public void onUserSpeaking(User user, boolean b) {
+
     }
 }

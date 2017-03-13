@@ -12,6 +12,7 @@ import net.dv8tion.jda.core.entities.User;
  * dean, who sometimes wont shut the fuck up and posts a 10m rows rant
  */
 public class HoferHandler extends IBaseHandler {
+    private static final int s_my_limit = 4;
     int m_messageCount;
     int m_numRoasts;
     User m_lastSenderUser;
@@ -41,7 +42,7 @@ public class HoferHandler extends IBaseHandler {
             m_messageCount++;
         }
 
-        if(m_messageCount > 6) {
+        if(m_messageCount > s_my_limit) {
             if(m_numRoasts < 1)
             sendMessage("OMG " + currentSender.getAsMention() + " will you shut the fuck up already?!");
             else if (m_numRoasts % 3 == 0) {

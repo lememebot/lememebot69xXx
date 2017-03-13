@@ -22,17 +22,20 @@ import java.util.ArrayList;
 public class BotServer extends ListenerAdapter {
     private final static Logger log = LogManager.getLogger();
     private JDA botInstance;
-    private ArrayList<IBaseHandler> eventsHandlers;
-    private BotAudioManager botAudioManager;
+    private final ArrayList<IBaseHandler> eventsHandlers;
+    private final BotAudioManager botAudioManager;
+    private final ArrayList<MediaRequest> handlersMediaRequests;
 
     public BotServer() {
         eventsHandlers = new ArrayList<>(16);
+        handlersMediaRequests = new ArrayList<>(4);
         botAudioManager = new BotAudioManager();
 
-        eventsHandlers.add(new DebugHandler());
+        eventsHandlers.add(new DebugHandler()); // used for command parse debugging
         eventsHandlers.add(new OverwatchHandler());
         eventsHandlers.add(new HoferHandler());
         eventsHandlers.add(new LastTimeHandler());
+        eventsHandlers.add(new RemindMeHandler());
     }
 
     public boolean start() {
@@ -60,32 +63,39 @@ public class BotServer extends ListenerAdapter {
         return false;
     }
 
-    public void shutdown() {
-        botAudioManager.shutdown();
-        botInstance.shutdown();
-        botInstance = null;
-    }
+    public void stop() {
+        if (null != botAudioManager) {
+            botAudioManager.shutdown();
+        }
 
+        if (null != botInstance) {
+            botInstance.shutdown(false);
+            botInstance = null;
+        }
+    }
 
     @Override
     public final void onMessageReceived(MessageReceivedEvent event) {
-        // Dont hook other bot messages
-        if(!event.getAuthor().isBot()) {
+        // Don't hook other bot messages
+        if (!event.getAuthor().isBot()) {
+            handlersMediaRequests.clear();
             MediaRequest mediaRequest;
 
-            for(IBaseHandler eventHandler : eventsHandlers) {
-                if(eventHandler.getCommand().parse(event.getMessage().getContent()))
-                {
+            for (IBaseHandler eventHandler : eventsHandlers) {
+                if (eventHandler.getCommand().parse(event.getMessage().getContent())) {
                     eventHandler.setEvent(event);
                     mediaRequest = eventHandler.onMessage(eventHandler.getCommand());
 
-                    if(null != mediaRequest)
-                    {
-                        log.debug("request {} from {}",mediaRequest.getMediaDescriptor().toString(),mediaRequest.getInvoker().getName());
+                    if (null != mediaRequest) {
+                        log.debug("request {} from {}", mediaRequest.getMediaDescriptor().toString(), mediaRequest.getInvoker().getName());
 
-                        botAudioManager.playAudio(event.getGuild(),mediaRequest);
+                        handlersMediaRequests.add(mediaRequest);
                     }
                 }
+            }
+
+            for (MediaRequest handlerRequest : handlersMediaRequests) {
+                botAudioManager.playAudio(event.getGuild(), handlerRequest);
             }
         }
     }

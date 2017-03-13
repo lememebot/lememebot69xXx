@@ -1,0 +1,24 @@
+.status_offline
+{
+-fx-background-color: #E0E0E0;
+}
+
+.status_online
+{
+-fx-background-color: #66BB6A;
+}
+
+.btn_start
+{
+-fx-background-color: #2196F3;
+}
+
+.btn_stop
+{
+-fx-background-color: #E53935;
+}
+
+.log
+{
+-fx-background-color: #000000;
+}

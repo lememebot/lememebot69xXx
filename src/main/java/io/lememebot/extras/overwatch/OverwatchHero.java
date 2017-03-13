@@ -3,6 +3,8 @@ package io.lememebot.extras.overwatch;
 import io.lememebot.media.IMediaProvider;
 import io.lememebot.media.MediaDescriptor;
 import io.lememebot.media.MediaSource;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import sun.security.provider.MD5;
 
 import java.io.BufferedReader;
@@ -18,7 +20,7 @@ import java.util.*;
  * Overwatch (<3) hero class
  */
 public class OverwatchHero implements IMediaProvider {
-
+    private final static Logger log = LogManager.getLogger();
     private final static int s_numHeroes;
     private final static Hashtable<Integer,OverwatchHero> s_heroes;
     private final static Random s_rnd;
@@ -101,20 +103,29 @@ public class OverwatchHero implements IMediaProvider {
         {
             try
             {
-                InputStream in = getClass().getResourceAsStream(m_resDirectory);
-                BufferedReader br = new BufferedReader(new InputStreamReader(in));
-                String audioFileName;
+                InputStream inputStream = getClass().getResourceAsStream(m_resDirectory);
+                if(null != inputStream) {
+                    String audioFileName;
+                    BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
 
-                while((audioFileName = br.readLine()) != null) {
-                    m_resFiles.add(new MediaDescriptor(m_resDirectory + audioFileName, MediaSource.JAVA_RESOURCE));
+                    // Read the directory file list and add them to resource file list
+                    while ((audioFileName = br.readLine()) != null) {
+                        m_resFiles.add(new MediaDescriptor(m_resDirectory + audioFileName, MediaSource.JAVA_RESOURCE));
+                    }
+
+                    log.debug("Found {} files for {}", m_resFiles.size(), getName());
+                } else {
+                    log.debug("No files found for {} in directory {}", getName(),m_resDirectory);
                 }
             }
             catch (java.io.IOException ex)
             {
+                log.debug("getMediaDescriptorList for {} .IO Exception: {}",getName(),ex.getMessage());
                 ex.printStackTrace();
             }
             catch (Exception ex)
             {
+                log.debug("getMediaDescriptorList for {} . Exception: {}",getName(),ex.getMessage());
                 ex.printStackTrace();
             }
         }
@@ -159,7 +170,7 @@ public class OverwatchHero implements IMediaProvider {
 
     public static OverwatchHero getRandomHero()
     {
-        int index = (s_rnd.nextInt() % s_numHeroes) + 1;
+        Integer index = (Math.abs(s_rnd.nextInt()) % s_numHeroes) + 1;
 
         return s_heroes.get(index);
     }

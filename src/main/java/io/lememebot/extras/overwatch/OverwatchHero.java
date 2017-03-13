@@ -60,6 +60,7 @@ public class OverwatchHero implements IMediaProvider {
         s_heroes.put(17,new OverwatchHero(OverwatchHeroClass.TANK,"winston","harambe")); // <3 we miss you
         s_heroes.put(18,new OverwatchHero(OverwatchHeroClass.TANK,"zarya","lesbo"));
         s_heroes.put(19,new OverwatchHero(OverwatchHeroClass.TANK,"orisa"));
+        s_heroes.put(25,new OverwatchHero(OverwatchHeroClass.TANK,"orisa","robot2"));
 
         // Support
         s_heroes.put(20,new OverwatchHero(OverwatchHeroClass.SUPPORT,"ana"));

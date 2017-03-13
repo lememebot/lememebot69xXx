@@ -49,7 +49,7 @@ public class OverwatchHero implements IMediaProvider {
         s_heroes.put(8,new OverwatchHero(OverwatchHeroClass.DEFENSE,"hanzo","bowguy?")); // My Man
         s_heroes.put(9,new OverwatchHero(OverwatchHeroClass.DEFENSE,"torbjorn"));
         s_heroes.put(10,new OverwatchHero(OverwatchHeroClass.DEFENSE,"junkrat"));
-        s_heroes.put(11,new OverwatchHero(OverwatchHeroClass.DEFENSE,"windowmaker"));
+        s_heroes.put(11,new OverwatchHero(OverwatchHeroClass.DEFENSE,"widowmaker","windowmaker"));
         s_heroes.put(12,new OverwatchHero(OverwatchHeroClass.DEFENSE,"mei","bitch"));
         s_heroes.put(13,new OverwatchHero(OverwatchHeroClass.DEFENSE,"bastion","johntron"));
 

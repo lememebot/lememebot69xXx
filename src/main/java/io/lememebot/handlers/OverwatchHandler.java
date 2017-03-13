@@ -42,7 +42,7 @@ public class OverwatchHandler extends IBaseHandler {
 
                 if (null == owHero) {
                     log.error("[ERROR] OverwatchHandler: got null hero");
-                    sendMessage("[ERROR] OverwatchHandler: got null hero");
+                    sendMessage(heroName + " does not exists");
                     break;
                 }
 

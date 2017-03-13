@@ -5,14 +5,10 @@ import io.lememebot.media.MediaDescriptor;
 import io.lememebot.media.MediaSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import sun.security.provider.MD5;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
-import java.net.URL;
 import java.util.*;
 
 /**
@@ -28,7 +24,6 @@ public class OverwatchHero implements IMediaProvider {
     private OverwatchHeroClass m_heroType;
     private final String m_name;
     private final String m_nickname; // Zafig autistic nicknames
-    private final String m_prettyName;
     private final String m_resDirectory;
     private final ArrayList<MediaDescriptor> m_resFiles;
 
@@ -76,7 +71,7 @@ public class OverwatchHero implements IMediaProvider {
         m_heroType = heroType;
         m_name = heroName;
         m_nickname = nickname;
-        m_prettyName = heroName.toUpperCase().charAt(0) + heroName.toLowerCase().substring(1);
+        String m_prettyName = heroName.toUpperCase().charAt(0) + heroName.toLowerCase().substring(1);
         m_resDirectory = "/Overwatch/" + m_prettyName + "/";
         m_resFiles = new ArrayList<>(2);
     }

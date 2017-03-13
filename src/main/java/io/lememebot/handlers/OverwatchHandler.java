@@ -74,7 +74,10 @@ public class OverwatchHandler extends IBaseHandler {
                 }
                 break;
             case "help":
-                sendMessage("[OverwatchHandler] Options:\n!hello <hero_name>, play the hero hello sound, you can also use zafig's retarded nicknames\n!potg (yall know what that is)\n!owroast (play this when some1 got roasted and mr.negi generation 3000 is unavailable)");
+                sendMessage("[OverwatchHandler] Options:\n" +
+                        "!hello <hero_name (default: random)> (play the hero hello sound, you can also use zafig's retarded nicknames)\n" +
+                        "!potg (yall know what that is)\n" +
+                        "!owroast (play this when some1 got roasted and mr.negi generation 3000 is unavailable)\n");
                 break;
         }
 

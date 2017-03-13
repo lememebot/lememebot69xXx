@@ -40,13 +40,13 @@ public class OverwatchHero implements IMediaProvider {
         s_heroes.put(1,new OverwatchHero(OverwatchHeroClass.OFFENSE,"genji","ninja"));
         s_heroes.put(2,new OverwatchHero(OverwatchHeroClass.OFFENSE,"mccree","cowboy"));
         s_heroes.put(3,new OverwatchHero(OverwatchHeroClass.OFFENSE,"solider76","solider"));
-        s_heroes.put(4,new OverwatchHero(OverwatchHeroClass.OFFENSE,"tracer"));
+        s_heroes.put(4,new OverwatchHero(OverwatchHeroClass.OFFENSE,"tracer","teleporter"));
         s_heroes.put(5,new OverwatchHero(OverwatchHeroClass.OFFENSE,"reaper","death"));
         s_heroes.put(6,new OverwatchHero(OverwatchHeroClass.OFFENSE,"sombra"));
-        s_heroes.put(7,new OverwatchHero(OverwatchHeroClass.OFFENSE,"pharah"));
+        s_heroes.put(7,new OverwatchHero(OverwatchHeroClass.OFFENSE,"pharah","rocketsolider"));
 
         // Defense
-        s_heroes.put(8,new OverwatchHero(OverwatchHeroClass.DEFENSE,"hanzo","bowguy?")); // My Man
+        s_heroes.put(8,new OverwatchHero(OverwatchHeroClass.DEFENSE,"hanzo","bowdude")); // My Man
         s_heroes.put(9,new OverwatchHero(OverwatchHeroClass.DEFENSE,"torbjorn"));
         s_heroes.put(10,new OverwatchHero(OverwatchHeroClass.DEFENSE,"junkrat"));
         s_heroes.put(11,new OverwatchHero(OverwatchHeroClass.DEFENSE,"widowmaker","windowmaker"));
@@ -59,8 +59,8 @@ public class OverwatchHero implements IMediaProvider {
         s_heroes.put(16,new OverwatchHero(OverwatchHeroClass.TANK,"roadhog","yoni")); // ayy
         s_heroes.put(17,new OverwatchHero(OverwatchHeroClass.TANK,"winston","harambe")); // <3 we miss you
         s_heroes.put(18,new OverwatchHero(OverwatchHeroClass.TANK,"zarya","lesbo"));
-        s_heroes.put(19,new OverwatchHero(OverwatchHeroClass.TANK,"orisa"));
-        s_heroes.put(25,new OverwatchHero(OverwatchHeroClass.TANK,"orisa","robot2"));
+        s_heroes.put(19,new OverwatchHero(OverwatchHeroClass.TANK,"orisa","robot2"));
+        s_heroes.put(25,new OverwatchHero(OverwatchHeroClass.TANK,"doomfist","terrycrews"));
 
         // Support
         s_heroes.put(20,new OverwatchHero(OverwatchHeroClass.SUPPORT,"ana"));

@@ -8,5 +8,6 @@ public enum OverwatchHeroClass {
     OFFENSE,
     DEFENSE,
     TANK,
-    SUPPORT
+    SUPPORT,
+    GOD
 }

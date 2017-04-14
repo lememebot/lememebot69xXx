@@ -3,6 +3,7 @@ package io.lememebot.handlers;
 import io.lememebot.media.MediaRequest;
 import io.lememebot.core.Command;
 import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 /**
  * Created by guy on 12/03/17.
@@ -31,9 +32,9 @@ public class HoferHandler extends IBaseHandler {
     }
 
     @Override
-    public MediaRequest onMessage(Command cmd)
+    public void onMessage(MessageReceivedEvent event, Command cmd)
     {
-        User currentSender = getEvent().getAuthor();
+        User currentSender = getAuthor();
 
         if(null == m_lastSenderUser || currentSender != m_lastSenderUser) {
             Init(currentSender);
@@ -54,7 +55,5 @@ public class HoferHandler extends IBaseHandler {
 
             m_numRoasts++;
         }
-
-        return null;
     }
 }

@@ -2,6 +2,7 @@ package io.lememebot.handlers;
 
 import io.lememebot.media.MediaRequest;
 import io.lememebot.core.Command;
+import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 /**
  * Project: lememebot69xXx
@@ -18,7 +19,7 @@ public class DebugHandler extends IBaseHandler {
     }
 
     @Override
-    public MediaRequest onMessage(Command cmd)
+    public void onMessage(MessageReceivedEvent event, Command cmd)
     {
         /*log.debug("[{}] {}: {}",
                 getEvent().getChannelType().toString(),
@@ -33,9 +34,7 @@ public class DebugHandler extends IBaseHandler {
 
         if(cmd.getCommand().equals("whoami"))
         {
-            sendMessage("You are " + getEvent().getAuthor().getAsMention());
+            sendMessage("You are " + event.getAuthor().getAsMention());
         }
-
-        return null;
     }
 }

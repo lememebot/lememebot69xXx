@@ -29,7 +29,10 @@ public class OverwatchHero implements IMediaProvider {
 
     static {
         s_rnd = new Random();
-        s_heroes = new Hashtable<Integer,OverwatchHero>(25);
+        s_heroes = new Hashtable<Integer,OverwatchHero>(26);
+
+        // Meme Gods
+        s_heroes.put(0,new OverwatchHero(OverwatchHeroClass.GOD,"filthyfrank","papafranku"));
 
         // Offensive
         s_heroes.put(1,new OverwatchHero(OverwatchHeroClass.OFFENSE,"genji","ninja"));
@@ -74,6 +77,17 @@ public class OverwatchHero implements IMediaProvider {
         String m_prettyName = heroName.toUpperCase().charAt(0) + heroName.toLowerCase().substring(1);
         m_resDirectory = "/Overwatch/" + m_prettyName + "/";
         m_resFiles = new ArrayList<>(2);
+    }
+
+    public static boolean heroExists(String heroName)
+    {
+        for (OverwatchHero hero : s_heroes.values())
+        {
+            if(hero.equals(heroName))
+                return true;
+        }
+
+        return false;
     }
 
     private OverwatchHero(OverwatchHeroClass heroType,String heroName)

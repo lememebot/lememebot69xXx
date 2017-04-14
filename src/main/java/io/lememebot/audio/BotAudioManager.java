@@ -27,6 +27,8 @@ import java.util.List;
  */
 public class BotAudioManager implements ConnectionListener {
     private final static Logger log = LogManager.getLogger();
+    private static BotAudioManager s_instance;
+
     private AudioPlayerManager m_playerManager;
     private AudioPlayer m_player;
     private AudioPlayerSendHandler m_handler;
@@ -34,13 +36,27 @@ public class BotAudioManager implements ConnectionListener {
     private final Hashtable<String,AudioManager> audioManagersByGuild;
     private VoiceChannel currentVoiceChannel;
 
-    public BotAudioManager()
+    static {
+        s_instance = new BotAudioManager();
+    }
+
+    private BotAudioManager()
     {
         audioManagersByGuild = new Hashtable<>(3);
         currentVoiceChannel = null;
     }
 
-    public void Init()
+    public static void init()
+    {
+        s_instance.initInstance();
+    }
+
+    public static void shutdown()
+    {
+        s_instance.destroyInstance();
+    }
+
+    public void initInstance()
     {
         m_playerManager = new DefaultAudioPlayerManager();
         AudioSourceManagers.registerLocalSource(m_playerManager);
@@ -50,7 +66,7 @@ public class BotAudioManager implements ConnectionListener {
         m_trackScheduler = new DefaultTrackScheduler(m_player);
     }
 
-    public void shutdown()
+    public void destroyInstance()
     {
         for(AudioManager audioManager : audioManagersByGuild.values())
         {
@@ -60,7 +76,12 @@ public class BotAudioManager implements ConnectionListener {
         m_playerManager.shutdown();
     }
 
-    public void playAudio(Guild guild, MediaRequest mediaRequest) {
+    public static void playAudio(Guild guild, MediaRequest mediaRequest)
+    {
+        s_instance.runPlayAudio(guild,mediaRequest);
+    }
+
+    public void runPlayAudio(Guild guild, MediaRequest mediaRequest) {
         if (!guild.getVoiceChannels().isEmpty()) {
             List<VoiceChannel> voiceChannelList = guild.getVoiceChannels();
             VoiceChannel userVoiceChannel = null;
@@ -84,6 +105,7 @@ public class BotAudioManager implements ConnectionListener {
                     audioManager.openAudioConnection(userVoiceChannel);
                     audioManager.setSendingHandler(m_handler);
                     audioManager.setConnectionListener(this);
+
                     currentVoiceChannel = userVoiceChannel;
                     audioManagersByGuild.put(guild.getId(),audioManager);
                 } else

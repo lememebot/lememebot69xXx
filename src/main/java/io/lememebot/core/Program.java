@@ -16,6 +16,7 @@ public class Program {
 
     public static void main(String args[]) {
         try {
+            Class.forName("org.sqlite.JDBC");
             MainWindow window= new MainWindow()
                     .build();
         } catch (Exception e) {

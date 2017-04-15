@@ -2,6 +2,7 @@ package io.lememebot.handlers;
 
 import io.lememebot.media.MediaRequest;
 import io.lememebot.core.Command;
+import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 /**
  * Created by guy on 12/03/17.
@@ -14,7 +15,7 @@ public class RemindMeHandler extends IBaseHandler {
     }
 
     @Override
-    public MediaRequest onMessage(Command cmd)
+    public void onMessage(MessageReceivedEvent event, Command cmd)
     {
         switch(cmd.getCommand().toLowerCase())
         {
@@ -24,7 +25,5 @@ public class RemindMeHandler extends IBaseHandler {
                 */
                 break;
         }
-
-        return null;
     }
 }

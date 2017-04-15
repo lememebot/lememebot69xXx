@@ -2,6 +2,7 @@ package io.lememebot.handlers;
 
 import io.lememebot.media.MediaRequest;
 import io.lememebot.core.Command;
+import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 /**
  * Created by guy on 12/03/17.
@@ -15,7 +16,7 @@ public class LastTimeHandler extends IBaseHandler {
     }
 
     @Override
-    public MediaRequest onMessage(Command cmd)
+    public void onMessage(MessageReceivedEvent event, Command cmd)
     {
         switch(cmd.getCommand())
         {
@@ -30,7 +31,5 @@ public class LastTimeHandler extends IBaseHandler {
 
                 break;
         }
-
-        return null;
     }
 }

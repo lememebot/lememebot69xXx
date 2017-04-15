@@ -8,5 +8,6 @@ public enum MediaSource {
     DB,
     URL,
     JAVA_RESOURCE,
-    FILE_SYSTEM
+    FILE_SYSTEM,
+    NULL
 }

@@ -1,11 +1,15 @@
 package io.lememebot.handlers;
 
+import io.lememebot.audio.BotAudioManager;
 import io.lememebot.media.MediaRequest;
 import io.lememebot.core.Command;
 import io.lememebot.core.Gang;
+import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.List;
 
 /**
  * Project: lememebot69xXx
@@ -20,7 +24,6 @@ public abstract class IBaseHandler {
     private MessageReceivedEvent m_event;
     final static Logger log = LogManager.getLogger();
 
-
     IBaseHandler(String strCmdPrefix)
     {
         m_command = new Command(strCmdPrefix);
@@ -31,10 +34,21 @@ public abstract class IBaseHandler {
         m_command = new Command(strCmdPrefix,cmdNumParameters);
     }
 
-    // Abstract method to be implemented on real handlers
-    public abstract MediaRequest onMessage(Command cmd);
+    public void onMessageReceived(MessageReceivedEvent event)
+    {
+        m_event = event;
+        onMessage(event,m_command);
+    }
 
-    public void setEvent(MessageReceivedEvent event)
+    // Abstract method to be implemented on real handlers
+    protected abstract void onMessage(MessageReceivedEvent event,Command cmd);
+
+    protected void playAudio(MediaRequest mediaRequest)
+    {
+        BotAudioManager.playAudio(m_event.getGuild(),mediaRequest);
+    }
+
+    private void setEvent(MessageReceivedEvent event)
     {
         m_event = event;
     }
@@ -44,19 +58,20 @@ public abstract class IBaseHandler {
         return m_command;
     }
 
-    MessageReceivedEvent getEvent()
-    {
-        return m_event;
-    }
-
     String getAuthorName()
     {
-        return getEvent().getAuthor().getName();
+        return m_event.getAuthor().getName();
     }
 
-    boolean isBotMentioned() {
+    User getAuthor()
+    {
+        return m_event.getAuthor();
+    }
+
+    boolean isBotMentioned()
+    {
         // TODO: check if this works
-        return getEvent().getMessage().getMentionedUsers().contains(getEvent().getJDA().getSelfUser());
+        return m_event.getMessage().getMentionedUsers().contains(m_event.getJDA().getSelfUser());
     }
 
     void sendMessage(String message)

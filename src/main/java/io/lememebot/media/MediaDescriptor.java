@@ -1,5 +1,6 @@
 package io.lememebot.media;
 
+import javax.print.attribute.standard.Media;
 import java.net.URL;
 /**
  * Project: lememebot69xXx
@@ -9,6 +10,7 @@ import java.net.URL;
  * Description:
  */
 public class MediaDescriptor {
+    public static final MediaDescriptor EMPTY = new MediaDescriptor("",MediaSource.NULL);
     private String m_resourceName;
     private MediaSource m_source;
 
@@ -32,6 +34,11 @@ public class MediaDescriptor {
 
     public MediaSource getAudioSource() {
         return m_source;
+    }
+
+    public boolean isNullOrEmpty()
+    {
+        return m_source.equals(MediaSource.NULL);
     }
 
     @Override

@@ -5,14 +5,10 @@ import io.lememebot.media.MediaDescriptor;
 import io.lememebot.media.MediaSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import sun.security.provider.MD5;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
-import java.net.URL;
 import java.util.*;
 
 /**
@@ -28,25 +24,27 @@ public class OverwatchHero implements IMediaProvider {
     private OverwatchHeroClass m_heroType;
     private final String m_name;
     private final String m_nickname; // Zafig autistic nicknames
-    private final String m_prettyName;
     private final String m_resDirectory;
     private final ArrayList<MediaDescriptor> m_resFiles;
 
     static {
         s_rnd = new Random();
-        s_heroes = new Hashtable<Integer,OverwatchHero>(25);
+        s_heroes = new Hashtable<Integer,OverwatchHero>(26);
+
+        // Meme Gods
+        s_heroes.put(0,new OverwatchHero(OverwatchHeroClass.GOD,"filthyfrank","papafranku"));
 
         // Offensive
         s_heroes.put(1,new OverwatchHero(OverwatchHeroClass.OFFENSE,"genji","ninja"));
         s_heroes.put(2,new OverwatchHero(OverwatchHeroClass.OFFENSE,"mccree","cowboy"));
         s_heroes.put(3,new OverwatchHero(OverwatchHeroClass.OFFENSE,"solider76","solider"));
-        s_heroes.put(4,new OverwatchHero(OverwatchHeroClass.OFFENSE,"tracer"));
+        s_heroes.put(4,new OverwatchHero(OverwatchHeroClass.OFFENSE,"tracer","teleporter"));
         s_heroes.put(5,new OverwatchHero(OverwatchHeroClass.OFFENSE,"reaper","death"));
         s_heroes.put(6,new OverwatchHero(OverwatchHeroClass.OFFENSE,"sombra"));
-        s_heroes.put(7,new OverwatchHero(OverwatchHeroClass.OFFENSE,"pharah"));
+        s_heroes.put(7,new OverwatchHero(OverwatchHeroClass.OFFENSE,"pharah","rocketsolider"));
 
         // Defense
-        s_heroes.put(8,new OverwatchHero(OverwatchHeroClass.DEFENSE,"hanzo","bowguy?")); // My Man
+        s_heroes.put(8,new OverwatchHero(OverwatchHeroClass.DEFENSE,"hanzo","bowdude")); // My Man
         s_heroes.put(9,new OverwatchHero(OverwatchHeroClass.DEFENSE,"torbjorn"));
         s_heroes.put(10,new OverwatchHero(OverwatchHeroClass.DEFENSE,"junkrat"));
         s_heroes.put(11,new OverwatchHero(OverwatchHeroClass.DEFENSE,"widowmaker","windowmaker"));
@@ -59,7 +57,8 @@ public class OverwatchHero implements IMediaProvider {
         s_heroes.put(16,new OverwatchHero(OverwatchHeroClass.TANK,"roadhog","yoni")); // ayy
         s_heroes.put(17,new OverwatchHero(OverwatchHeroClass.TANK,"winston","harambe")); // <3 we miss you
         s_heroes.put(18,new OverwatchHero(OverwatchHeroClass.TANK,"zarya","lesbo"));
-        s_heroes.put(19,new OverwatchHero(OverwatchHeroClass.TANK,"orisa"));
+        s_heroes.put(19,new OverwatchHero(OverwatchHeroClass.TANK,"orisa","robot2"));
+        s_heroes.put(25,new OverwatchHero(OverwatchHeroClass.TANK,"doomfist","terrycrews"));
 
         // Support
         s_heroes.put(20,new OverwatchHero(OverwatchHeroClass.SUPPORT,"ana"));
@@ -75,9 +74,20 @@ public class OverwatchHero implements IMediaProvider {
         m_heroType = heroType;
         m_name = heroName;
         m_nickname = nickname;
-        m_prettyName = heroName.toUpperCase().charAt(0) + heroName.toLowerCase().substring(1);
+        String m_prettyName = heroName.toUpperCase().charAt(0) + heroName.toLowerCase().substring(1);
         m_resDirectory = "/Overwatch/" + m_prettyName + "/";
         m_resFiles = new ArrayList<>(2);
+    }
+
+    public static boolean heroExists(String heroName)
+    {
+        for (OverwatchHero hero : s_heroes.values())
+        {
+            if(hero.equals(heroName))
+                return true;
+        }
+
+        return false;
     }
 
     private OverwatchHero(OverwatchHeroClass heroType,String heroName)
@@ -172,6 +182,6 @@ public class OverwatchHero implements IMediaProvider {
     {
         Integer index = (Math.abs(s_rnd.nextInt()) % s_numHeroes) + 1;
 
-        return s_heroes.get(index);
+        return s_heroes.getOrDefault(index,null);
     }
 }
